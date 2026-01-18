@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情侣生活记录 - 记录我们的美好时光</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 自定义Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF9AA2',
+                        secondary: '#B5EAD7',
+                        accent: '#C7CEEA',
+                        highlight: '#FF6B6B',
+                        light: '#F8F9FA',
+                        dark: '#495057'
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'Open Sans', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.5s ease-in-out',
+                        'pulse-slow': 'pulse 3s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .gradient-bg {
+                background: linear-gradient(135deg, #FF9AA2 0%, #B5EAD7 50%, #C7CEEA 100%);
+            }
+            .text-gradient {
+                background-clip: text;
+                -webkit-background-clip: text;
+                color: transparent;
+                background-image: linear-gradient(135deg, #FF9AA2, #B5EAD7);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+            .timeline-line {
+                position: absolute;
+                left: 50%;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background: linear-gradient(to bottom, #FF9AA2, #C7CEEA);
+                transform: translateX(-50%);
+            }
+            .timeline-dot {
+                position: absolute;
+                left: 50%;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #FF9AA2, #C7CEEA);
+                transform: translateX(-50%);
+                border: 4px solid white;
+                box-shadow: 0 0 0 4px rgba(255, 154, 162, 0.2);
+            }
+            .map-marker {
+                animation: bounce 2s infinite;
+            }
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% {
+                    transform: translateY(0);
+                }
+                40% {
+                    transform: translateY(-10px);
+                }
+                60% {
+                    transform: translateY(-5px);
+                }
+            }
+            .heart-beat {
+                animation: heartbeat 1.5s ease-in-out infinite;
+            }
+            @keyframes heartbeat {
+                0% {
+                    transform: scale(1);
+                }
+                14% {
+                    transform: scale(1.1);
+                }
+                28% {
+                    transform: scale(1);
+                }
+                42% {
+                    transform: scale(1.15);
+                }
+                70% {
+                    transform: scale(1);
+                }
+            }
+        }
+    </style>
+</head>
+<body class="bg-light font-sans">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md fixed w-full z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/340f6f475ede4425b373f832b0277d60~tplv-a9rns2rl98-image.image?lk3s=8e244e95&rcl=202601122017132EF2AA64A42A9AD3C0F6&rrcfp=f06b921b&x-expires=1770812296&x-signature=UtL7Pxa5MBXU5WUKcBOdFskHOYU%3D" alt="情侣生活记录" class="h-10">
+                <span class="text-xl font-bold text-gradient">情侣生活记录</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#timeline" class="text-dark hover:text-primary transition-colors duration-300">时光轴</a>
+                <a href="#map" class="text-dark hover:text-primary transition-colors duration-300">互动地图</a>
+                <a href="#anniversary" class="text-dark hover:text-primary transition-colors duration-300">纪念日</a>
+                <a href="#story" class="text-dark hover:text-primary transition-colors duration-300">照片故事</a>
+                <a href="#qna" class="text-dark hover:text-primary transition-colors duration-300">互动问答</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-dark focus:outline-none">
+                <i class="fa fa-bars text-2xl"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg absolute w-full">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="#timeline" class="text-dark hover:text-primary transition-colors duration-300 py-2">时光轴</a>
+                <a href="#map" class="text-dark hover:text-primary transition-colors duration-300 py-2">互动地图</a>
+                <a href="#anniversary" class="text-dark hover:text-primary transition-colors duration-300 py-2">纪念日</a>
+                <a href="#story" class="text-dark hover:text-primary transition-colors duration-300 py-2">照片故事</a>
+                <a href="#qna" class="text-dark hover:text-primary transition-colors duration-300 py-2">互动问答</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 头部横幅 -->
+    <header class="gradient-bg min-h-screen flex items-center justify-center pt-16">
+        <div class="container mx-auto px-4 py-16 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">记录我们的爱情故事</h1>
+            <p class="text-xl md:text-2xl text-white mb-10 max-w-2xl mx-auto animate-slide-up">
+                在这里，记录我们一起走过的每一个瞬间，每一个地方，每一个特殊的日子
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4 animate-slide-up" style="animation-delay: 0.2s;">
+                <a href="#timeline" class="bg-white text-primary hover:bg-opacity-90 font-bold py-3 px-8 rounded-full transition-all duration-300 shadow-lg">
+                    开始记录
+                </a>
+                <a href="#anniversary" class="bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary font-bold py-3 px-8 rounded-full transition-all duration-300">
+                    查看纪念日
+                </a>
+            </div>
+            <div class="mt-16 relative">
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/529b765b5b634e609457f27ef78aeac5~tplv-a9rns2rl98-image.image?lk3s=8e244e95&rcl=202601122017132EF2AA64A42A9AD3C0F6&rrcfp=f06b921b&x-expires=1770812297&x-signature=grKZrRUP4P5ByVItBtEKiSe3LE8%3D" alt="情侣时光轴" class="max-w-full md:max-w-2xl mx-auto rounded-lg shadow-2xl animate-fade-in" style="animation-delay: 0.4s;">
+                <div class="absolute -bottom-5 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <a href="#timeline" class="text-white">
+                        <i class="fa fa-chevron-down text-3xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 时光轴部分 -->
+    <section id="timeline" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">我们的时光轴</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">记录我们一起走过的每一天，每一个特殊的时刻</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mt-6"></div>
+            </div>
+
+            <div class="relative">
+                <!-- 时间轴线 -->
+                <div class="timeline-line hidden md:block"></div>
+
+                <!-- 时间轴内容 -->
+                <div class="timeline-container">
+                    <!-- 添加记录按钮 -->
+                    <div class="mb-12 text-center">
+                        <button id="add-timeline-item" class="bg-primary hover:bg-opacity-90 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 shadow-lg flex items-center mx-auto">
+                            <i class="fa fa-plus mr-2"></i> 添加新记录
+                        </button>
+                    </div>
+
+                    <!-- 时间轴项目 -->
+                    <div class="timeline-items space-y-12">
+                        <!-- 项目1 -->
+                        <div class="timeline-item md:flex items-center animate-fade-in">
+                            <div class="timeline-dot hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-12 mb-6 md:mb-0 md:text-right">
+                                <span class="text-sm text-gray-500">2023年7月15日</span>
+                                <h3 class="text-xl font-bold mt-1 mb-2">第一次约会</h3>
+                                <p class="text-gray-600">我们在星巴克度过了美好的下午，聊了很多，感觉时间过得特别快。</p>
+                            </div>
+                            <div class="md:w-1/2 md:pl-12">
+                                <div class="rounded-lg overflow-hidden shadow-lg card-hover">
+                                    <img src="https://p11-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/1068275954284626046~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1783772269&x-signature=JKRmgyEaNGb8uLDNAI1QdsUPGqI%3D" alt="第一次约会" class="w-full h-64 object-cover">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 项目2 -->
+                        <div class="timeline-item md:flex items-center animate-fade-in" style="animation-delay: 0.2s;">
+                            <div class="timeline-dot hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-12 mb-6 md:mb-0 md:text-right md:order-1 order-2">
+                                <span class="text-sm text-gray-500">2023年8月5日</span>
+                                <h3 class="text-xl font-bold mt-1 mb-2">第一次旅行</h3>
+                                <p class="text-gray-600">我们一起去了海边，看了日出日落，这是我们第一次一起旅行，留下了很多美好的回忆。</p>
+                            </div>
+                            <div class="md:w-1/2 md:pl-12 md:order-2 order-1">
+                                <div class="rounded-lg overflow-hidden shadow-lg card-hover">
+                                    <img src="https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/909386078613406031~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1783772269&x-signature=oeRnFDcGuEdo8UxkPZ4XpvMttgo%3D" alt="第一次旅行" class="w-full h-64 object-cover">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 项目3 -->
+                        <div class="timeline-item md:flex items-center animate-fade-in" style="animation-delay: 0.4s;">
+                            <div class="timeline-dot hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-12 mb-6 md:mb-0 md:text-right">
+                                <span class="text-sm text-gray-500">2023年9月10日</span>
+                                <h3 class="text-xl font-bold mt-1 mb-2">恋爱一周年</h3>
+                                <p class="text-gray-600">我们在一起一周年啦！这一年里有欢笑，有泪水，但更多的是相互支持和成长。</p>
+                            </div>
+                            <div class="md:w-1/2 md:pl-12">
+                                <div class="rounded-lg overflow-hidden shadow-lg card-hover">
+                                    <img src="https://p11-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/1018242325372338206~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1783772269&x-signature=9WWC2KlyFC%2FQ9yY8GpRxo8%2F3rI8%3D" alt="恋爱一周年" class="w-full h-64 object-cover">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 互动地图部分 -->
+    <section id="map" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">我们的足迹</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">标记我们一起去过的地方，创建属于我们的旅行地图</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mt-6"></div>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+                <div class="md:w-1/2">
+                    <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                        <h3 class="text-xl font-bold mb-4">我们的旅行地图</h3>
+                        <div class="relative w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/40624745025949e8b88b5bd29d1f5ea7~tplv-a9rns2rl98-image.image?lk3s=8e244e95&rcl=202601122017132EF2AA64A42A9AD3C0F6&rrcfp=f06b921b&x-expires=1770812296&x-signature=lOHM%2FvSvtFU3R0bHylwK8RTuk9U%3D" alt="互动地图" class="w-full h-full object-cover">
+                            
+                            <!-- 地图标记点 -->
+                            <div class="absolute top-1/4 left-1/4 map-marker cursor-pointer" data-location="巴黎">
+                                <i class="fa fa-map-marker text-primary text-3xl"></i>
+                            </div>
+                            <div class="absolute top-1/3 left-1/2 map-marker cursor-pointer" data-location="罗马">
+                                <i class="fa fa-map-marker text-primary text-3xl"></i>
+                            </div>
+                            <div class="absolute top-1/2 left-1/3 map-marker cursor-pointer" data-location="东京">
+                                <i class="fa fa-map-marker text-primary text-3xl"></i>
+                            </div>
+                            <div class="absolute top-1/3 left-3/4 map-marker cursor-pointer" data-location="纽约">
+                                <i class="fa fa-map-marker text-primary text-3xl"></i>
+                            </div>
+                        </div>
+                        <button id="add-map-marker" class="mt-6 bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-6 rounded-full transition-all duration-300 shadow-md w-full">
+                            <i class="fa fa-plus mr-2"></i> 添加新地点
+                        </button>
+                    </div>
+                </div>
+
+                <div class="md:w-1/2">
+                    <div id="location-details" class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                        <h3 class="text-xl font-bold mb-4">地点详情</h3>
+                        <div id="location-content" class="text-center py-8">
+                            <i class="fa fa-map-marker text-primary text-4xl mb-4"></i>
+                            <p class="text-gray-600">点击地图上的标记查看详情</p>
+                        </div>
+                        <div id="location-placeholder" class="hidden">
+                            <h4 id="location-name" class="text-lg font-bold mb-2">巴黎</h4>
+                            <p id="location-date" class="text-sm text-gray-500 mb-4">2023年7月15日 - 2023年7月22日</p>
+                            <p id="location-description" class="text-gray-600 mb-4">我们在巴黎度过了美好的一周，参观了埃菲尔铁塔、卢浮宫，品尝了正宗的法式早餐。这是我们第一次一起出国旅行，留下了很多美好的回忆。</p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <img src="https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2237704392513028111~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1783772269&x-signature=7XtU%2BliBT%2Bhp7J5M62X7FNFbtgw%3D" alt="巴黎照片" class="w-full h-32 object-cover rounded-lg">
+                                <img src="https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/916886611929464832~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1783772269&x-signature=N5QKptobrdqVhhWEGfdGiZgPcCA%3D" alt="巴黎照片" class="w-full h-32 object-cover rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 纪念日部分 -->
+    <section id="anniversary" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">我们的纪念日</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">记录并提醒我们的重要日子</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mt-6"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 纪念日1 -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover">
+                    <div class="h-40 bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+                        <i class="fa fa-heart text-white text-6xl heart-beat"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">恋爱纪念日</h3>
+                        <p class="text-gray-500 mb-4">2022年9月10日</p>
+                        <div class="mb-4">
+                            <div class="text-3xl font-bold text-primary">325</div>
+                            <div class="text-sm text-gray-500">天</div>
+                        </div>
+                        <p class="text-gray-600">我们相遇的那一天，注定了我们的故事开始</p>
+                    </div>
+                </div>
+
+                <!-- 纪念日2 -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover">
+                    <div class="h-40 bg-gradient-to-r from-accent to-secondary flex items-center justify-center">
+                        <i class="fa fa-calendar text-white text-6xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">第一次约会</h3>
+                        <p class="text-gray-500 mb-4">2022年9月15日</p>
+                        <div class="mb-4">
+                            <div class="text-3xl font-bold text-accent">320</div>
+                            <div class="text-sm text-gray-500">天</div>
+                        </div>
+                        <p class="text-gray-600">我们在星巴克度过了美好的下午，聊了很多</p>
+                    </div>
+                </div>
+
+                <!-- 纪念日3 -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover">
+                    <div class="h-40 bg-gradient-to-r from-highlight to-primary flex items-center justify-center">
+                        <i class="fa fa-diamond text-white text-6xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">求婚纪念日</h3>
+                        <p class="text-gray-500 mb-4">2023年6月15日</p>
+                        <div class="mb-4">
+                            <div class="text-3xl font-bold text-highlight">152</div>
+                            <div class="text-sm text-gray-500">天</div>
+                        </div>
+                        <p class="text-gray-600">这一天，我向你许下了一生的承诺</p>
+                    </div>
+                </div>
+
+                <!-- 添加纪念日卡片 -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center h-80 cursor-pointer hover:border-primary transition-colors duration-300" id="add-anniversary">
+                    <div class="text-center">
+                        <i class="fa fa-plus text-gray-400 text-4xl mb-4"></i>
+                        <p class="text-gray-500">添加新纪念日</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 照片故事部分 -->
+    <section id="story" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">AI照片故事</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">上传你们的照片，让AI帮你们生成美丽的故事视频</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mt-6"></div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold mb-4">上传照片</h3>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors duration-300" id="photo-upload-area">
+                        <i class="fa fa-cloud-upload text-gray-400 text-4xl mb-4"></i>
+                        <p class="text-gray-500 mb-2">点击或拖拽照片到这里</p>
+                        <p class="text-gray-400 text-sm">支持JPG、PNG格式，最多10张照片</p>
+                        <input type="file" id="photo-upload" class="hidden" multiple accept="image/jpeg,image/png">
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold mb-4">已选择的照片</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4" id="selected-photos">
+                        <!-- 示例照片 -->
+                        <div class="relative">
+                            <img src="https://p11-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/1836837227727159307~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1783772269&x-signature=o6Sk%2BxDY1PZlxEYvjZenS5%2B2M8k%3D" alt="照片1" class="w-full h-24 object-cover rounded-lg">
+                            <button class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <img src="https://p11-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/947450578454577174~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1783772269&x-signature=shtjDyXa8RmnSWX6gmdvmsGm4Ic%3D" alt="照片2" class="w-full h-24 object-cover rounded-lg">
+                            <button class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <img src="https://p11-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/918751804551856161~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1783772269&x-signature=w5N%2F2%2BZIIOCllz1mKqau0E5vRdE%3D" alt="照片3" class="w-full h-24 object-cover rounded-lg">
+                            <button class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold mb-4">故事设置</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-700 mb-2">故事风格</label>
+                            <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option>浪漫爱情</option>
+                                <option>快乐时光</option>
+                                <option>旅行冒险</option>
+                                <option>温馨日常</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">背景音乐</label>
+                            <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option>浪漫情歌</option>
+                                <option>轻快流行</option>
+                                <option>温馨钢琴</option>
+                                <option>无音乐</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button id="generate-story" class="bg-primary hover:bg-opacity-90 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 shadow-lg">
+                        <i class="fa fa-magic mr-2"></i> 生成故事视频
+                    </button>
+                </div>
+            </div>
+
+            <!-- 生成结果预览 -->
+            <div class="mt-12 max-w-4xl mx-auto hidden" id="story-result">
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-4">我们的爱情故事</h3>
+                        <div class="aspect-w-16 aspect-h-9 mb-4">
+                            <div class="bg-gray-100 rounded-lg flex items-center justify-center h-80">
+                                <video class="w-full h-full object-cover" controls>
+                                    <source src="#" type="video/mp4">
+                                    您的浏览器不支持视频播放。
+                                </video>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-gray-500">生成时间: 2023年10月15日</span>
+                            </div>
+                            <div class="flex space-x-4">
+                                <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-full transition-all duration-300">
+                                    <i class="fa fa-download mr-2"></i> 下载
+                                </button>
+                                <button class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-full transition-all duration-300">
+                                    <i class="fa fa-share-alt mr-2"></i> 分享
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 互动问答部分 -->
+    <section id="qna" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">情侣互动问答</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">通过有趣的问题，增进彼此的了解，创造更多共同话题</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mt-6"></div>
+            </div>
+
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                    <h3 class="text-xl font-bold mb-6 text-center">今日问答挑战</h3>
+                    
+                    <div id="question-container" class="mb-8">
+                        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                            <p class="text-lg font-medium text-gray-800 mb-4">"你最喜欢我们一起做的哪件事？为什么？"</p>
+                            <div class="text-sm text-gray-500">问题 #12</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-gray-700 mb-2">你的回答</label>
+                                <textarea class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" rows="4" placeholder="写下你的回答..."></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Ta的回答</label>
+                                <textarea class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" rows="4" placeholder="写下Ta的回答..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button id="prev-question" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-full transition-all duration-300">
+                            <i class="fa fa-arrow-left mr-2"></i> 上一题
+                        </button>
+                        <button id="save-answers" class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-6 rounded-full transition-all duration-300">
+                            保存回答
+                        </button>
+                        <button id="next-question" class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-6 rounded-full transition-all duration-300">
+                            下一题 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-xl font-bold mb-4">已回答的问题</h3>
+                        <ul class="space-y-3">
+                            <li class="flex justify-between items-center pb-2 border-b border-gray-100">
+                                <span class="text-gray-800">"你第一次见到我时的印象是什么？"</span>
+                                <span class="text-green-500"><i class="fa fa-check"></i></span>
+                            </li>
+                            <li class="flex justify-between items-center pb-2 border-b border-gray-100">
+                                <span class="text-gray-800">"我做过什么让你感到最开心的事？"</span>
+                                <span class="text-green-500"><i class="fa fa-check"></i></span>
+                            </li>
+                            <li class="flex justify-between items-center pb-2 border-b border-gray-100">
+                                <span class="text-gray-800">"你希望我们未来一起完成的一件事是什么？"</span>
+                                <span class="text-green-500"><i class="fa fa-check"></i></span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-xl font-bold mb-4">挑战进度</h3>
+                        <div class="mb-6">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-700">完成度</span>
+                                <span class="text-primary font-bold">12/30</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-primary h-2.5 rounded-full" style="width: 40%"></div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-gray-600 mb-4">完成所有问答挑战，解锁特别奖励！</p>
+                            <button class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-6 rounded-full transition-all duration-300">
+                                查看我的成就
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 底部部分 -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center space-x-2">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/340f6f475ede4425b373f832b0277d60~tplv-a9rns2rl98-image.image?lk3s=8e244e95&rcl=202601122017132EF2AA64A42A9AD3C0F6&rrcfp=f06b921b&x-expires=1770812296&x-signature=UtL7Pxa5MBXU5WUKcBOdFskHOYU%3D" alt="情侣生活记录" class="h-10">
+                        <span class="text-xl font-bold text-white">情侣生活记录</span>
+                    </div>
+                    <p class="text-gray-400 mt-2">记录我们的爱情故事，创造永恒的回忆</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-white hover:text-primary transition-colors duration-300">
+                        <i class="fa fa-weixin text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-white hover:text-primary transition-colors duration-300">
+                        <i class="fa fa-weibo text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-white hover:text-primary transition-colors duration-300">
+                        <i class="fa fa-instagram text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-white hover:text-primary transition-colors duration-300">
+                        <i class="fa fa-youtube-play text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 情侣生活记录. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 模态框 -->
+    <!-- 添加时光轴记录模态框 -->
+    <div id="timeline-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">添加新记录</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times text-2xl"></i>
+                </button>
+            </div>
+            <form id="timeline-form">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">日期</label>
+                    <input type="date" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">标题</label>
+                    <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="给这个时刻起个名字">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">描述</label>
+                    <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" rows="4" placeholder="记录下当时的感受..."></textarea>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">上传照片</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors duration-300">
+                        <i class="fa fa-cloud-upload text-gray-400 text-3xl mb-2"></i>
+                        <p class="text-gray-500">点击上传照片</p>
+                        <input type="file" class="hidden" accept="image/jpeg,image/png">
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" class="close-modal bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-full transition-all duration-300 mr-4">
+                        取消
+                    </button>
+                    <button type="submit" class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-6 rounded-full transition-all duration-300">
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加地图标记模态框 -->
+    <div id="map-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">添加新地点</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times text-2xl"></i>
+                </button>
+            </div>
+            <form id="map-form">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">地点名称</label>
+                    <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="例如：巴黎埃菲尔铁塔">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">日期</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="date" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <input type="date" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">描述</label>
+                    <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" rows="4" placeholder="记录在这里的美好回忆..."></textarea>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">上传照片</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors duration-300">
+                        <i class="fa fa-cloud-upload text-gray-400 text-3xl mb-2"></i>
+                        <p class="text-gray-500">点击上传照片</p>
+                        <input type="file" class="hidden" accept="image/jpeg,image/png" multiple>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" class="close-modal bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-full transition-all duration-300 mr-4">
+                        取消
+                    </button>
+                    <button type="submit" class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-6 rounded-full transition-all duration-300">
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加纪念日模态框 -->
+    <div id="anniversary-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">添加新纪念日</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times text-2xl"></i>
+                </button>
+            </div>
+            <form id="anniversary-form">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">纪念日名称</label>
+                    <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="例如：恋爱一周年">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">日期</label>
+                    <input type="date" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">描述</label>
+                    <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="这个日子对我们的意义..."></textarea>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">类型</label>
+                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option>恋爱纪念日</option>
+                        <option>约会纪念日</option>
+                        <option>求婚纪念日</option>
+                        <option>结婚纪念日</option>
+                        <option>其他</option>
+                    </select>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" class="close-modal bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-full transition-all duration-300 mr-4">
+                        取消
+                    </button>
+                    <button type="submit" class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-6 rounded-full transition-all duration-300">
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 生成照片故事模态框 -->
+    <div id="story-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full mx-4">
+            <div class="text-center">
+                <div class="mb-6">
+                    <div class="inline-block p-4 rounded-full bg-primary bg-opacity-10">
+                        <i class="fa fa-spinner fa-spin text-primary text-4xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">正在生成照片故事...</h3>
+                <p class="text-gray-600 mb-6">AI正在处理您的照片，创建美丽的故事视频，请稍候...</p>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                    <div class="bg-primary h-2.5 rounded-full" id="story-progress" style="width: 0%"></div>
+                </div>
+                <p class="text-gray-500" id="story-status">准备中...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // 移动端菜单切换
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // 如果是移动端，点击后关闭菜单
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+
+        // 模态框控制
+        const modals = {
+            timeline: document.getElementById('timeline-modal'),
+            map: document.getElementById('map-modal'),
+            anniversary: document.getElementById('anniversary-modal'),
+            story: document.getElementById('story-modal')
+        };
+
+        // 打开模态框
+        document.getElementById('add-timeline-item').addEventListener('click', function() {
+            modals.timeline.classList.remove('hidden');
+        });
+
+        document.getElementById('add-map-marker').addEventListener('click', function() {
+            modals.map.classList.remove('hidden');
+        });
+
+        document.getElementById('add-anniversary').addEventListener('click', function() {
+            modals.anniversary.classList.remove('hidden');
+        });
+
+        document.getElementById('generate-story').addEventListener('click', function() {
+            modals.story.classList.remove('hidden');
+            
+            // 模拟进度条
+            let progress = 0;
+            const progressBar = document.getElementById('story-progress');
+            const statusText = document.getElementById('story-status');
+            
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress < 30) {
+                    statusText.textContent = '正在处理照片...';
+                } else if (progress < 60) {
+                    statusText.textContent = '正在创建故事...';
+                } else if (progress < 90) {
+                    statusText.textContent = '正在添加音乐...';
+                } else {
+                    statusText.textContent = '即将完成...';
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        modals.story.classList.add('hidden');
+                        document.getElementById('story-result').classList.remove('hidden');
+                    }, 500);
+                }
+            }, 200);
+        });
+
+        // 关闭模态框
+        document.querySelectorAll('.close-modal').forEach(button => {
+            button.addEventListener('click', function() {
+                Object.values(modals).forEach(modal => {
+                    modal.classList.add('hidden');
+                });
+            });
+        });
+
+        // 点击模态框外部关闭
+        Object.values(modals).forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
+
+        // 地图标记点交互
+        document.querySelectorAll('.map-marker').forEach(marker => {
+            marker.addEventListener('click', function() {
+                const location = this.getAttribute('data-location');
+                const locationContent = document.getElementById('location-content');
+                const locationPlaceholder = document.getElementById('location-placeholder');
+                
+                locationContent.classList.add('hidden');
+                locationPlaceholder.classList.remove('hidden');
+                
+                // 根据地点更新内容
+                document.getElementById('location-name').textContent = location;
+                
+                if (location === '巴黎') {
+                    document.getElementById('location-date').textContent = '2023年7月15日 - 2023年7月22日';
+                    document.getElementById('location-description').textContent = '我们在巴黎度过了美好的一周，参观了埃菲尔铁塔、卢浮宫，品尝了正宗的法式早餐。这是我们第一次一起出国旅行，留下了很多美好的回忆。';
+                } else if (location === '罗马') {
+                    document.getElementById('location-date').textContent = '2023年5月1日 - 2023年5月5日';
+                    document.getElementById('location-description').textContent = '罗马的历史和文化让我们着迷，我们参观了古罗马斗兽场、万神殿，品尝了正宗的意大利面和披萨。';
+                } else if (location === '东京') {
+                    document.getElementById('location-date').textContent = '2023年3月10日 - 2023年3月17日';
+                    document.getElementById('location-description').textContent = '东京的现代与传统完美结合，我们去了东京塔、浅草寺，还体验了温泉。日本的美食和文化让我们流连忘返。';
+                } else if (location === '纽约') {
+                    document.getElementById('location-date').textContent = '2023年12月20日 - 2023年12月27日';
+                    document.getElementById('location-description').textContent = '纽约的繁华和活力让我们兴奋不已，我们参观了自由女神像、帝国大厦，还看了百老汇演出。这是一次难忘的城市之旅。';
+                }
+            });
+        });
+
+        // 照片上传区域交互
+        document.getElementById('photo-upload-area').addEventListener('click', function() {
+            document.getElementById('photo-upload').click();
+        });
+
+        document.getElementById('photo-upload').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                // 这里可以处理文件上传逻辑
+                console.log('Selected files:', e.target.files);
+            }
+        });
+
+        // 问答挑战交互
+        document.getElementById('next-question').addEventListener('click', function() {
+            // 这里可以实现加载下一个问题的逻辑
+            alert('加载下一个问题');
+        });
+
+        document.getElementById('prev-question').addEventListener('click', function() {
+            // 这里可以实现加载上一个问题的逻辑
+            alert('加载上一个问题');
+        });
+
+        document.getElementById('save-answers').addEventListener('click', function() {
+            // 这里可以实现保存回答的逻辑
+            alert('回答已保存');
+        });
+
+        // 表单提交处理
+        document.getElementById('timeline-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            modals.timeline.classList.add('hidden');
+            alert('记录已保存');
+        });
+
+        document.getElementById('map-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            modals.map.classList.add('hidden');
+            alert('地点已添加');
+        });
+
+        document.getElementById('anniversary-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            modals.anniversary.classList.add('hidden');
+            alert('纪念日已添加');
+        });
+
+        // 页面滚动时导航栏样式变化
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-lg');
+                nav.classList.add('bg-white');
+            } else {
+                nav.classList.remove('shadow-lg');
+                nav.classList.remove('bg-white');
+            }
+        });
+
+        // 初始化页面时触发一次滚动事件
+        window.dispatchEvent(new Event('scroll'));
+
+        // 计算纪念日倒计时
+        function updateCountdowns() {
+            const anniversaries = document.querySelectorAll('#anniversary .card-hover');
+            
+            anniversaries.forEach(card => {
+                const dateElement = card.querySelector('.text-gray-500');
+                if (dateElement) {
+                    const dateText = dateElement.textContent;
+                    const date = new Date(dateText);
+                    const today = new Date();
+                    
+                    // 设置时间为当天的0点，避免时区问题
+                    date.setHours(0, 0, 0, 0);
+                    today.setHours(0, 0, 0, 0);
+                    
+                    // 计算时间差
+                    const diffTime = today - date;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    // 更新显示
+                    const daysElement = card.querySelector('.text-3xl');
+                    if (daysElement) {
+                        daysElement.textContent = diffDays;
+                    }
+                }
+            });
+        }
+
+        // 页面加载完成后更新倒计时
+        window.addEventListener('load', updateCountdowns);
+    </script>
+</body>
+</html>
